@@ -2,137 +2,244 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Otomatik Güncellenen Yayın</title>
-    <!-- HLS.js desteği (m3u8 yayınları için) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TABİİ SPOR - Canlı Yayın</title>
+    <!-- HLS.js desteği -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
+            background: #0a0a1a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
-            background: #1e1e2f;
-            color: white;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #111122;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .player-wrapper {
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
         }
         video {
-            max-width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            margin-top: 20px;
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .info {
+            text-align: center;
+            margin-top: 16px;
+            color: #ccc;
+            font-size: 0.9rem;
         }
         .status {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #aaa;
+            background: #1e1e2a;
+            padding: 10px;
+            border-radius: 40px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            text-align: center;
+            color: #ffaa66;
+            font-family: monospace;
         }
         button {
-            background: #3a86ff;
+            background: #2c6e9e;
             border: none;
             color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 1rem;
+            border-radius: 40px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
+            transition: 0.2s;
+            font-weight: bold;
         }
         button:hover {
-            background: #2666cc;
+            background: #1f4f73;
+            transform: scale(0.98);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #555;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 12px; }
+            h1 { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
-    <h1>📺 RONALDO Canlı Yayın</h1>
-    <video id="video-player" controls width="900"></video>
-    <div class="status" id="status">Yayın yükleniyor...</div>
-    <button onclick="loadChannel()">🔄 Yenile ve Güncel Yayını Al</button>
+<div class="container">
+    <h1>📺 TABİİ SPOR • Canlı Yayın</h1>
+    <div class="player-wrapper">
+        <video id="videoPlayer" controls playsinline></video>
+    </div>
+    <div class="status" id="statusMessage">⏳ Yükleniyor, güncel yayın adresi alınıyor...</div>
+    <div style="display: flex; justify-content: center; gap: 12px;">
+        <button id="refreshBtn">🔄 Yayını Yenile</button>
+    </div>
+    <div class="info">M3U listesindeki yayın linki değişse bile otomatik güncellenir.</div>
+    <div class="footer">proxy.php ile M3U anlık taranır</div>
+</div>
 
-    <script>
-        const video = document.getElementById('video-player');
-        const statusDiv = document.getElementById('status');
+<script>
+    (function() {
+        const video = document.getElementById('videoPlayer');
+        const statusDiv = document.getElementById('statusMessage');
+        const refreshBtn = document.getElementById('refreshBtn');
         
-        // M3U listesindeki kanal adıyla BİREBİR AYNI olmalı
-        const channelName = 'beIN Sports 2-R';
+        // ⚠️ M3U'deki kanal adıyla birebir aynı olmalı!
+        const CHANNEL_NAME = 'beIN Sports 2-R';
+        
+        let hls = null;
+        let currentStreamUrl = null;
 
-        let hls = null; // HLS instance'ını sakla
-
-        async function loadChannel() {
-            statusDiv.textContent = '📡 Güncel yayın adresi alınıyor...';
-            statusDiv.style.color = '#ffaa00';
-            
-            try {
-                // Proxy'den en güncel yayın URL'sini al
-                const response = await fetch(`proxy.php?kanal=${encodeURIComponent(channelName)}`);
-                const data = await response.json();
-
-                if (data.hata) {
-                    statusDiv.textContent = '❌ Hata: ' + data.hata;
-                    statusDiv.style.color = '#ff6666';
-                    console.error('Proxy hatası:', data.hata);
-                    return;
-                }
-
-                if (!data.url) {
-                    statusDiv.textContent = '❌ Yayın URL'si alınamadı.';
-                    statusDiv.style.color = '#ff6666';
-                    return;
-                }
-
-                const streamUrl = data.url;
-                console.log('Alınan yayın adresi:', streamUrl);
-                statusDiv.textContent = '✅ Yayın adresi alındı, oynatıcı başlatılıyor...';
-                statusDiv.style.color = '#aaffaa';
-
-                // Önceki HLS örneğini temizle
-                if (hls) {
-                    hls.destroy();
-                    hls = null;
-                }
-
-                // Video elementini durdur ve sıfırla
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-
-                // Yayın formatına göre oynatıcıyı seç
-                if (streamUrl.includes('.m3u8') && Hls.isSupported()) {
-                    // HLS (m3u8) desteği
-                    hls = new Hls();
-                    hls.loadSource(streamUrl);
-                    hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        video.play().catch(e => console.log('Otomatik oynatma engellendi:', e));
-                        statusDiv.textContent = '📺 Yayın oynatılıyor (HLS)';
-                        statusDiv.style.color = '#aaffaa';
-                    });
-                    hls.on(Hls.Events.ERROR, (event, data) => {
-                        console.error('HLS hatası:', data);
-                        statusDiv.textContent = '⚠️ Yayın hatası, yeniden deneyin.';
-                        statusDiv.style.color = '#ffaa66';
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    // Safari için native HLS desteği
-                    video.src = streamUrl;
-                    video.addEventListener('loadedmetadata', () => {
-                        video.play().catch(e => console.log(e));
-                        statusDiv.textContent = '📺 Yayın oynatılıyor (Native HLS)';
-                    });
-                } else {
-                    // Diğer formatlar (mp4 vb.)
-                    video.src = streamUrl;
-                    video.addEventListener('canplay', () => {
-                        video.play().catch(e => console.log(e));
-                        statusDiv.textContent = '📺 Yayın oynatılıyor';
-                    });
-                }
-            } catch (error) {
-                console.error('Fetch hatası:', error);
-                statusDiv.textContent = '❌ Bağlantı hatası: ' + error.message;
-                statusDiv.style.color = '#ff6666';
+        // Durum mesajı güncelleme
+        function setStatus(msg, isError = false) {
+            statusDiv.innerHTML = msg;
+            statusDiv.style.color = isError ? '#ff8888' : '#aaffaa';
+            if (!isError) {
+                statusDiv.style.background = '#1e2a2a';
+            } else {
+                statusDiv.style.background = '#2a1e1e';
             }
         }
 
-        // Sayfa yüklendiğinde otomatik başlat
-        window.addEventListener('load', loadChannel);
-    </script>
+        // Proxy'den güncel yayın URL'sini al
+        async function fetchStreamUrl() {
+            setStatus('📡 M3U listesi taranıyor, en güncel yayın adresi alınıyor...', false);
+            try {
+                // proxy.php çağrısı (aynı dizinde olduğunu varsayar)
+                const response = await fetch(`proxy.php?kanal=${encodeURIComponent(CHANNEL_NAME)}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    setStatus('❌ Hata: ' + data.error, true);
+                    console.error('Proxy hatası:', data.error);
+                    return null;
+                }
+                if (!data.url) {
+                    setStatus('❌ Yayın URL alınamadı.', true);
+                    return null;
+                }
+                console.log('✅ Alınan URL:', data.url);
+                return data.url;
+            } catch (err) {
+                setStatus('❌ Bağlantı hatası (proxy): ' + err.message, true);
+                console.error(err);
+                return null;
+            }
+        }
+
+        // Video oynatıcıya URL'yi yükle
+        function loadVideo(streamUrl) {
+            if (!streamUrl) return false;
+            
+            // Önceki oynatıcıyı temizle
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            
+            // HLS (.m3u8) desteği
+            if (streamUrl.includes('.m3u8') && Hls.isSupported()) {
+                hls = new Hls({
+                    debug: false,
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                });
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(e => {
+                        console.warn('Otomatik oynatma engellendi, kullanıcı etkileşimi gerekebilir:', e);
+                        setStatus('▶️ Yayın hazır, başlatmak için oynat tuşuna basın', false);
+                    });
+                    setStatus('📺 Canlı yayın oynuyor (HLS)', false);
+                });
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS hatası:', data);
+                    if (data.fatal) {
+                        setStatus('⚠️ Yayın hatası, yeniden deneniyor...', true);
+                        setTimeout(() => refreshStream(), 3000);
+                    } else {
+                        setStatus('⚠️ Yayında hafif hata, devam ediliyor...', false);
+                    }
+                });
+                return true;
+            } 
+            // Safari native HLS
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamUrl;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play().catch(e => console.log(e));
+                    setStatus('📺 Oynatılıyor (Safari)', false);
+                });
+                return true;
+            }
+            // Diğer formatlar (mp4 vb)
+            else {
+                video.src = streamUrl;
+                video.addEventListener('canplay', () => {
+                    video.play().catch(e => console.log(e));
+                    setStatus('📺 Oynatılıyor', false);
+                });
+                return true;
+            }
+        }
+
+        // Ana fonksiyon: yenileme işlemi
+        async function refreshStream() {
+            const newUrl = await fetchStreamUrl();
+            if (newUrl) {
+                currentStreamUrl = newUrl;
+                loadVideo(currentStreamUrl);
+            } else {
+                setStatus('❌ Yayın alınamadı, daha sonra yenileyin', true);
+            }
+        }
+
+        // Sayfa ilk yüklenince
+        refreshStream();
+        
+        // Yenile butonu
+        refreshBtn.addEventListener('click', () => {
+            refreshStream();
+        });
+        
+        // Her 4 dakikada bir otomatik yenile (M3U güncellenme ihtimaline karşı)
+        setInterval(() => {
+            console.log('Otomatik yenileme çalışıyor...');
+            refreshStream();
+        }, 4 * 60 * 1000);
+    })();
+</script>
 </body>
 </html>
