@@ -6,7 +6,7 @@ header('Access-Control-Allow-Origin: *');
 $playlistUrl = 'https://raw.githubusercontent.com/kadirsener1/avva/refs/heads/main/playlist.m3u';
 
 // Kanal adını URL'den al (örnek: proxy.php?kanal=TABİİ SPOR)
-$channelName = $_GET['kanal'] ?? '';
+$channelName = $_GET['kanal'] ?? 'beIN Sports 2-R';
 
 if (empty($channelName)) {
     echo json_encode(['error' => 'Kanal adı belirtilmedi. Örnek: ?kanal=TABİİ SPOR']);
