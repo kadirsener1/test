@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPTV Proxy ile Otomatik Güncelleme</title>
+    <!-- HLS.js kütüphanesini ekleyelim (m3u8 yayınları için) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <video id="video-player" controls width="800"></video>
+
+    <script>
+        const video = document.getElementById('video-player');
+        const channelName = 'TRT 1'; // İzlemek istediğiniz kanalın adı
+
+        async function loadChannel() {
+            try {
+                // Proxy'den kanalın GÜNCEL URL'ini iste
+                const response = await fetch(`proxy.php?kanal=${encodeURIComponent(channelName)}`);
+                const data = await response.json();
+
+                if (data.url) {
+                    // Gelen URL, HLS (m3u8) formatında bir yayın adresi ise
+                    if (Hls.isSupported()) {
+                        var hls = new Hls();
+                        hls.loadSource(data.url);
+                        hls.attachMedia(video);
+                    }
+                    // URL, doğrudan oynatılabilen (mp4 gibi) bir video dosyası ise
+                    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = data.url;
+                    }
+                } else {
+                    console.error('Hata:', data.hata);
+                }
+            } catch (error) {
+                console.error('Proxy hatası:', error);
+            }
+        }
+
+        // Sayfa yüklendiğinde kanalı yükle
+        loadChannel();
+    </script>
+</body>
+</html>
