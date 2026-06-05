@@ -1,131 +1,626 @@
-<html>
-
-<!-- DO NO EDIT ANYTHING TO WORK PORPELY -->
-<!-- © @AvishkarPatil | https://github.com/avipatilpro -->
-
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no" />
-	<title>Sen TİVİ</title>
-	<link rel="shortcut icon" type="image/x-icon" https://www.xalimasn.com/wp-content/uploads/2019/11/unnamed.png">
-	<meta name="robots" content="noindex" />
-	<link rel="stylesheet" href="data/css/darkmode.min.css">
-	<script src="data/css/lazysizes.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evrensel Video Oynatıcı - Tüm Formatlar + Proxy Desteği</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #1a1a2e;
+            --surface2: #16213e;
+            --accent: #e94560;
+            --accent2: #0f3460;
+            --text: #e0e0e0;
+            --text2: #a0a0b0;
+            --radius: 12px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(233, 68, 96, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(15, 52, 96, 0.15) 0%, transparent 50%);
+        }
+
+        .player-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .header {
+            background: var(--surface2);
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header .logo {
+            font-size: 1.6rem;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-panel {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--surface);
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            min-width: 70px;
+        }
+        .input-group input {
+            flex: 1 1 200px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(233, 68, 96, 0.15);
+        }
+        .input-group input::placeholder {
+            color: #555;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--surface2);
+            position: relative;
+        }
+        .file-upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(233, 68, 96, 0.03);
+        }
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-upload-area .icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.2px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(233, 68, 96, 0.3);
+        }
+        .btn-primary:hover {
+            background: #ff5a7a;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(233, 68, 96, 0.4);
+        }
+        .btn-secondary {
+            background: var(--accent2);
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #1a4a7a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .progress-container {
+            margin-top: 8px;
+            background: var(--surface2);
+            border-radius: 20px;
+            height: 6px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .progress-container.active {
+            opacity: 1;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), #ff6b6b);
+            border-radius: 20px;
+            transition: width 0.1s linear;
+        }
+
+        .status-message {
+            font-size: 0.85rem;
+            color: var(--accent);
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        .spinner.active {
+            display: inline-block;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .video-wrapper {
+            background: #000;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            outline: none;
+        }
+        .placeholder {
+            color: #333;
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .control-panel {
+                padding: 14px 16px;
+            }
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .input-group label {
+                min-width: auto;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-	<div id="jtvh1">
-		<a href="index.html">
-			<h1>Sen Tivi</h1> </div>
-	</a>
-	<div id="content">
-		<div class="container">
-			<div id="list" class="row">
-				<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="spor.html" class="card">
-<img class="lazyload" data-src="./kategori/spor.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">SPOR KANALLARI</p>
-</div>
-</a>
-</div>
+    <div class="player-container">
+        <div class="header">
+            <span class="logo">🎬</span>
+            <h1>Evrensel Video Oynatıcı</h1>
+        </div>
 
+        <div class="control-panel">
+            <!-- Dosya Yükleme -->
+            <div class="file-upload-area" id="dropZone">
+                <span class="icon">📁</span>
+                <p style="margin:0; font-weight:500;">Video dosyası seçmek için tıklayın veya sürükleyin</p>
+                <p style="margin:4px 0 0; font-size:0.75rem; color:var(--text2);">MKV, AVI, MOV, FLV, WMV, MP4, WebM, vb.</p>
+                <input type="file" id="fileInput" accept="video/*">
+            </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="yspor.html" class="card">
-<img class="lazyload" data-src="./kategori/yabancilar.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">YABANCI SPOR KANALLAR</p>
-</div>
-</a>
-</div>
+            <!-- URL Girişi -->
+            <div class="input-group">
+                <label>🌐 Video URL</label>
+                <input type="url" id="videoUrl" placeholder="https://example.com/video.mkv">
+            </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="haber.html" class="card">
-<img class="lazyload" data-src="./kategori/haber.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">HABER KANALLARI</p>
-</div>
-</a>
-</div>
+            <!-- Proxy URL Girişi -->
+            <div class="input-group">
+                <label>🛡️ Proxy URL</label>
+                <input type="url" id="proxyUrl" placeholder="https://cors-proxy.example.com/">
+                <span style="font-size:0.7rem; color:var(--text2);">(isteğe bağlı, CORS/erişim sorunları için)</span>
+            </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="http://sentv.unaux.com/3/ulusal/index.html" class="card">
-<img class="lazyload" data-src="./kategori/ulusal.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">ULUSAL KANALLAR</p>
-</div>
-</a>
-</div>
+            <!-- Butonlar -->
+            <div class="button-row">
+                <button class="btn-primary" id="btnConvertPlay">
+                    ⚡ Dönüştür ve Oynat (FFmpeg)
+                </button>
+                <button class="btn-secondary" id="btnNativePlay">
+                    ▶️ Doğrudan Oynat (Native)
+                </button>
+                <button class="btn-outline" id="btnClear">
+                    🗑️ Temizle
+                </button>
+            </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="sinema.html" class="card">
-<img class="lazyload" data-src="./kategori/film.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">SİNEMA KANALLARI</p>
-</div>
-</a>
-</div>
+            <!-- Durum / Progress -->
+            <div class="status-message" id="statusMsg">
+                <span class="spinner" id="spinner"></span>
+                <span id="statusText">Hazır</span>
+            </div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="belgesel.html" class="card">
-<img class="lazyload" data-src="./kategori/belgesel.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">BELGESEL KANALLARI</p>
-</div>
-</a>
-</div>
+        <!-- Video Oynatma Alanı -->
+        <div class="video-wrapper" id="videoWrapper">
+            <span class="placeholder" id="placeholder">🎥</span>
+            <video id="videoPlayer" controls crossorigin="anonymous" style="display:none;"></video>
+        </div>
+    </div>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="muzik.html" class="card">
-<img class="lazyload" data-src="./kategori/muzik.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">MÜZİK KANALLARI</p>
-</div>
-</a>
-</div>
+    <!-- FFmpeg.wasm (0.11.6 - kararlı ve basit API) -->
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js">
+    </script>
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="cocuk.html" class="card">
-<img class="lazyload" data-src="./kategori/cocuk.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">ÇOCUK KANALLARI</p>
-</div>
-</a>
-</div>
+    <script>
+        (function() {
+            // --- DOM Elementleri ---
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const videoUrlInput = document.getElementById('videoUrl');
+            const proxyUrlInput = document.getElementById('proxyUrl');
+            const btnConvertPlay = document.getElementById('btnConvertPlay');
+            const btnNativePlay = document.getElementById('btnNativePlay');
+            const btnClear = document.getElementById('btnClear');
+            const statusText = document.getElementById('statusText');
+            const spinner = document.getElementById('spinner');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const placeholder = document.getElementById('placeholder');
+            const videoWrapper = document.getElementById('videoWrapper');
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="dini.html" class="card">
-<img class="lazyload" data-src="./kategori/dini.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">DİNİ KANALLAR</p>
-</div>
-</a>
-</div>
+            // --- State ---
+            let selectedFile = null;
+            let ffmpegInstance = null;
+            let ffmpegLoading = false;
+            let currentObjectURL = null;
 
+            // --- Yardımcı Fonksiyonlar ---
+            function setStatus(msg, showSpinner = false) {
+                statusText.textContent = msg;
+                if (showSpinner) spinner.classList.add('active');
+                else spinner.classList.remove('active');
+            }
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="yerel.html" class="card">
-<img class="lazyload" data-src="./kategori/yerel.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">YEREL KANALLAR</p>
-</div>
-</a>
-</div>
+            function setProgress(percent) {
+                if (percent >= 0 && percent <= 100) {
+                    progressContainer.classList.add('active');
+                    progressBar.style.width = percent + '%';
+                } else {
+                    progressContainer.classList.remove('active');
+                    progressBar.style.width = '0%';
+                }
+            }
 
-<div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-<a href="./radyo/radyo.html" class="card">
-<img class="lazyload" data-src="./kategori/radyo.png" style="height: 120px">
-<div class="card-body">
-<p class="card-text">RADYOLAR</p>
-</div>
-</a>
-</div>
+            function hideVideo() {
+                videoPlayer.style.display = 'none';
+                placeholder.style.display = 'block';
+                if (currentObjectURL) {
+                    URL.revokeObjectURL(currentObjectURL);
+                    currentObjectURL = null;
+                }
+                videoPlayer.src = '';
+                videoPlayer.removeAttribute('src');
+            }
 
+            function showVideo(src) {
+                placeholder.style.display = 'none';
+                videoPlayer.style.display = 'block';
+                if (currentObjectURL && currentObjectURL !== src) {
+                    URL.revokeObjectURL(currentObjectURL);
+                }
+                currentObjectURL = src;
+                videoPlayer.src = src;
+                videoPlayer.load();
+            }
 
+            function resetAll() {
+                hideVideo();
+                setStatus('Hazır');
+                setProgress(-1);
+                selectedFile = null;
+                fileInput.value = '';
+                videoUrlInput.value = '';
+                // proxyUrlInput boş kalabilir, isteğe bağlı temizlenebilir
+            }
 
-</div></div></div>
-	</div>
+            // --- FFmpeg Yükleme ---
+            async function loadFFmpeg() {
+                if (ffmpegInstance && ffmpegInstance.isLoaded()) return ffmpegInstance;
+                if (ffmpegLoading) {
+                    // Zaten yükleniyor, bekle
+                    while (ffmpegLoading) {
+                        await new Promise(r => setTimeout(r, 200));
+                    }
+                    return ffmpegInstance;
+                }
+                ffmpegLoading = true;
+                setStatus('FFmpeg motoru yükleniyor (≈31 MB)...', true);
+                setProgress(0);
+                try {
+                    const { createFFmpeg, fetchFile } = FFmpeg;
+                    ffmpegInstance = createFFmpeg({
+                        log: false,
+                        corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.6/dist/ffmpeg-core.js',
+                        progress: ({ ratio }) => {
+                            setProgress(Math.round(ratio * 100));
+                        }
+                    });
+                    await ffmpegInstance.load();
+                    setStatus('FFmpeg hazır ✅');
+                    setProgress(-1);
+                    return ffmpegInstance;
+                } catch (err) {
+                    setStatus('FFmpeg yüklenemedi ❌: ' + err.message);
+                    setProgress(-1);
+                    throw err;
+                } finally {
+                    ffmpegLoading = false;
+                }
+            }
+
+            // --- Video Verisini Al (Dosya veya URL + Proxy) ---
+            async function getVideoData() {
+                if (selectedFile) {
+                    setStatus('Dosya okunuyor...', true);
+                    const buffer = await selectedFile.arrayBuffer();
+                    return new Uint8Array(buffer);
+                }
+                const url = videoUrlInput.value.trim();
+                if (!url) throw new Error('Lütfen bir video dosyası seçin veya URL girin.');
+
+                const proxy = proxyUrlInput.value.trim();
+                let fetchUrl = url;
+                if (proxy) {
+                    // Proxy kullanımı: proxy URL'si + video URL'si (birçok CORS proxy'si bu şekilde çalışır)
+                    fetchUrl = proxy + url;
+                    setStatus(`Proxy üzerinden indiriliyor: ${fetchUrl}`, true);
+                } else {
+                    setStatus(`Video indiriliyor: ${url}`, true);
+                }
+
+                const response = await fetch(fetchUrl, {
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'video/*,*/*'
+                    }
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const contentLength = response.headers.get('content-length');
+                const total = contentLength ? parseInt(contentLength) : 0;
+                const reader = response.body.getReader();
+                const chunks = [];
+                let received = 0;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    received += value.length;
+                    if (total > 0) {
+                        const pct = Math.round((received / total) * 100);
+                        setStatus(`İndiriliyor... %${pct}`, true);
+                        setProgress(pct);
+                    }
+                }
+                setProgress(-1);
+                const buffer = new Uint8Array(received);
+                let offset = 0;
+                for (const chunk of chunks) {
+                    buffer.set(chunk, offset);
+                    offset += chunk.length;
+                }
+                return buffer;
+            }
+
+            // --- FFmpeg ile Dönüştür ve Oynat ---
+            async function convertAndPlay() {
+                hideVideo();
+                if (!selectedFile && !videoUrlInput.value.trim()) {
+                    setStatus('⚠️ Lütfen bir dosya veya URL belirtin.');
+                    return;
+                }
+                try {
+                    const ffmpeg = await loadFFmpeg();
+                    const videoData = await getVideoData();
+                    const inputFileName = 'input_video.' + (selectedFile?.name?.split('.').pop() || 'mkv');
+                    const outputFileName = 'output.webm';
+
+                    setStatus('FFmpeg dosyayı işliyor...', true);
+                    setProgress(0);
+                    ffmpeg.setProgress(({ ratio }) => {
+                        setProgress(Math.round(ratio * 100));
+                    });
+
+                    // Sanal dosya sistemine yaz
+                    ffmpeg.FS('writeFile', inputFileName, videoData);
+
+                    // Dönüştürme komutu: WebM VP9 + Opus, hızlı preset
+                    await ffmpeg.run(
+                        '-i', inputFileName,
+                        '-c:v', 'libvpx-vp9',
+                        '-b:v', '1M',
+                        '-c:a', 'libopus',
+                        '-b:a', '128k',
+                        '-preset', 'ultrafast',
+                        '-deadline', 'realtime',
+                        '-cpu-used', '5',
+                        '-threads', '2',
+                        '-y',
+                        outputFileName
+                    );
+
+                    const outputData = ffmpeg.FS('readFile', outputFileName);
+                    // Belleği temizle
+                    ffmpeg.FS('unlink', inputFileName);
+                    ffmpeg.FS('unlink', outputFileName);
+
+                    const blob = new Blob([outputData.buffer], { type: 'video/webm' });
+                    const objectURL = URL.createObjectURL(blob);
+                    showVideo(objectURL);
+                    setStatus('✅ Dönüştürme tamamlandı, oynatılıyor...');
+                    setProgress(-1);
+                } catch (err) {
+                    setStatus('❌ Hata: ' + err.message);
+                    setProgress(-1);
+                    console.error(err);
+                }
+            }
+
+            // --- Doğrudan (Native) Oynat ---
+            function nativePlay() {
+                hideVideo();
+                let src = null;
+                if (selectedFile) {
+                    src = URL.createObjectURL(selectedFile);
+                    showVideo(src);
+                    setStatus('▶️ Dosyadan doğrudan oynatılıyor.');
+                    return;
+                }
+                const url = videoUrlInput.value.trim();
+                if (!url) {
+                    setStatus('⚠️ Lütfen bir URL girin veya dosya seçin.');
+                    return;
+                }
+                const proxy = proxyUrlInput.value.trim();
+                if (proxy) {
+                    src = proxy + url;
+                } else {
+                    src = url;
+                }
+                showVideo(src);
+                setStatus('▶️ Doğrudan oynatma deneniyor (tarayıcı desteğine bağlı).');
+            }
+
+            // --- Event Listeners ---
+            btnConvertPlay.addEventListener('click', convertAndPlay);
+            btnNativePlay.addEventListener('click', nativePlay);
+            btnClear.addEventListener('click', resetAll);
+
+            // Dosya seçimi
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    selectedFile = e.target.files[0];
+                    videoUrlInput.value = ''; // URL ile çakışmasın
+                    setStatus(`📄 Seçilen dosya: ${selectedFile.name}`);
+                } else {
+                    selectedFile = null;
+                }
+            });
+
+            // Sürükle-Bırak
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--accent)';
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.borderColor = 'rgba(255,255,255,0.15)';
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'rgba(255,255,255,0.15)';
+                if (e.dataTransfer.files.length > 0) {
+                    selectedFile = e.dataTransfer.files[0];
+                    videoUrlInput.value = '';
+                    setStatus(`📄 Sürüklenen dosya: ${selectedFile.name}`);
+                    // file input'u da güncelle
+                    const dt = new DataTransfer();
+                    dt.items.add(selectedFile);
+                    fileInput.files = dt.files;
+                }
+            });
+
+            // URL girildiğinde dosya seçimini temizle
+            videoUrlInput.addEventListener('input', () => {
+                if (videoUrlInput.value.trim()) {
+                    selectedFile = null;
+                    fileInput.value = '';
+                }
+            });
+
+            // Sayfa yüklenirken placeholder göster
+            hideVideo();
+            setStatus('Hazır - Dosya seçin veya URL girin.');
+        })();
+    </script>
 </body>
-
 </html>
