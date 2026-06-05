@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çoklu Link Oynatıcı</title>
-    <!-- HLS.js kütüphanesi -->
+    <title>Proxy Destekli Çoklu Oynatıcı</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body {
@@ -72,7 +71,6 @@
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
-            margin-top: 10px;
         }
         button {
             background: #0d6efd;
@@ -104,6 +102,11 @@
             width: 100%;
             cursor: pointer;
         }
+        .proxy-note {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -119,10 +122,13 @@
             <button id="playPauseBtn">▶ Oynat</button>
             <button id="nextBtn">Sonraki ⏭</button>
         </div>
+        <div class="proxy-note">
+            🔒 Tüm bağlantılar <strong>corsproxy.io</strong> üzerinden güvenli şekilde aktarılıyor.
+        </div>
     </div>
 
     <script>
-        // ===== VERDİĞİNİZ 7 LİNK =====
+        // ===== KENDİ LİNKLERİNİZ =====
         const playlist = [
             { name: "beIN Sports 1-Gav", url: "https://gavatlar.b-cdn.net/bein.m3u8" },
             { name: "FAST FUN BOX TR",  url: "http://cdn.bittv.ltd/ottplayer/bigteisti3/FAST_FUN_BOX_TR/czJyNHd4MGtpczp5eTN3OTk2bDh5/index.m3u8" },
@@ -133,6 +139,9 @@
             { name: "chat.cfbu247",      url: "https://chat.cfbu247.sbs/api/proxy/playlist?token=eyJjaGFubmVsSWQiOiI2MiIsInRzIjoxNzc5OTY4MDg5NjQ1fQ==" }
         ];
         // ==============================
+
+        // CORS Proxy kullan (tüm linkler için otomatik)
+        const PROXY_URL = "https://corsproxy.io/?";
 
         let currentIndex = 0;
         let videoElement = null;
@@ -173,7 +182,6 @@
                 videoElement.load();
             }
 
-            // Yeni video elementi oluştur
             videoElement = document.createElement('video');
             videoElement.setAttribute('controls', '');
             videoElement.setAttribute('playsinline', '');
@@ -181,16 +189,17 @@
             mediaWrapper.innerHTML = '';
             mediaWrapper.appendChild(videoElement);
 
-            const item = playlist[index];
-            const url = item.url;
+            const originalUrl = playlist[index].url;
+            // Tüm linkleri proxy üzerinden geçir
+            const proxiedUrl = PROXY_URL + encodeURIComponent(originalUrl);
 
-            // HLS mi kontrol et (m3u8 veya .txt içerik olabilir)
-            const isHls = /\.m3u8($|\?)|\.txt($|\?)/i.test(url) || url.includes('index.m3u8') || url.includes('playlist?');
+            const isHls = /\.m3u8($|\?)|\.txt($|\?)/i.test(originalUrl) || 
+                         originalUrl.includes('index.m3u8') || 
+                         originalUrl.includes('playlist?');
 
             if (isHls && Hls.isSupported()) {
-                // HLS.js ile oynat
                 hls = new Hls();
-                hls.loadSource(url);
+                hls.loadSource(proxiedUrl);
                 hls.attachMedia(videoElement);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     videoElement.play().catch(e => console.log('Oynatma başlatılamadı:', e));
@@ -200,27 +209,22 @@
                     if (data.fatal) {
                         switch (data.type) {
                             case Hls.ErrorTypes.NETWORK_ERROR:
-                                console.error('Ağ hatası, yeniden deneniyor...');
                                 hls.startLoad();
                                 break;
                             case Hls.ErrorTypes.MEDIA_ERROR:
-                                console.error('Medya hatası, kurtarılmaya çalışılıyor...');
                                 hls.recoverMediaError();
                                 break;
                             default:
-                                console.error('Geri kurtarılamaz hata, HLS yok ediliyor.');
                                 destroyHls();
                                 break;
                         }
                     }
                 });
             } else {
-                // Normal video kaynağı (mp4, webm vb.) veya HLS desteklenmeyen tarayıcı
-                videoElement.src = url;
+                videoElement.src = proxiedUrl;
                 videoElement.play().catch(e => console.log('Oynatma başlatılamadı:', e));
             }
 
-            // Ortak video olayları
             videoElement.addEventListener('loadedmetadata', () => {
                 progressBar.max = videoElement.duration || 0;
                 updateTimeDisplay();
@@ -262,7 +266,6 @@
             });
         }
 
-        // Buton işlevleri
         playPauseBtn.addEventListener('click', () => {
             if (!videoElement) return;
             if (videoElement.paused) {
@@ -291,11 +294,10 @@
             videoElement.currentTime = progressBar.value;
         });
 
-        // Başlat
         if (playlist.length > 0) {
             loadMedia(0);
         } else {
-            playlistContainer.innerHTML = '<p style="padding:10px;">Hiç link eklenmedi.</p>';
+            playlistContainer.innerHTML = '<p>Hiç link eklenmedi.</p>';
             playPauseBtn.disabled = true;
             prevBtn.disabled = true;
             nextBtn.disabled = true;
