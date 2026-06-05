@@ -2,7 +2,7 @@
 <?php
 header('Content-Type: application/json');
 
-$playlistUrl = 'https://ornek-site.com/kanallar.m3u'; // M3U listenizin adresi
+$playlistUrl = 'https://raw.githubusercontent.com/kadirsener1/avva/refs/heads/main/playlist.m3u'; // M3U listenizin adresi
 $channelName = $_GET['kanal'] ?? '';               // Kanal adını URL'den al
 
 if (empty($channelName)) {
